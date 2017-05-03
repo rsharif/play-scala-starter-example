@@ -1,9 +1,17 @@
 package controllers
 
+import _root_.reactivemongo.api.DefaultDB
+import _root_.reactivemongo.api.MongoConnection
+import _root_.reactivemongo.api.MongoDriver
+import _root_.reactivemongo.bson.BSONDocumentReader
+import _root_.reactivemongo.bson.BSONDocumentWriter
+import _root_.reactivemongo.bson.Macros
+import _root_.reactivemongo.bson._
 import akka.actor.ActorSystem
 import javax.inject._
 import play.api._
 import play.api.mvc._
+import services.{ScalaDriverPersonCreator, ReactivePersonCreator}
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.concurrent.duration._
 
@@ -17,8 +25,14 @@ import scala.concurrent.duration._
  * @param exec We need an `ExecutionContext` to execute our
  * asynchronous code.
  */
+
 @Singleton
-class AsyncController @Inject() (actorSystem: ActorSystem)(implicit exec: ExecutionContext) extends Controller {
+class AsyncController @Inject()(
+  actorSystem: ActorSystem,
+  reactivePersonCreator: ReactivePersonCreator,
+//  casbahPersonCreator: CasbahPersonCreator,
+  scalaDriverPersonCreator: ScalaDriverPersonCreator)
+  (implicit exec: ExecutionContext) extends Controller {
 
   /**
    * Create an Action that returns a plain text message after a delay
@@ -29,13 +43,20 @@ class AsyncController @Inject() (actorSystem: ActorSystem)(implicit exec: Execut
    * a path of `/message`.
    */
   def message = Action.async {
-    getFutureMessage(1.second).map { msg => Ok(msg) }
+    Future.successful(Ok)
   }
 
-  private def getFutureMessage(delayTime: FiniteDuration): Future[String] = {
-    val promise: Promise[String] = Promise[String]()
-    actorSystem.scheduler.scheduleOnce(delayTime) { promise.success("Hi!") }
-    promise.future
+  def reactiveInsert = Action.async {
+    reactivePersonCreator.createPerson().map { _ => Ok }
   }
+
+//  def casbahInsert = Action.async {
+//    casbahPersonCreator.createPerson().map { _ => Ok }
+//  }
+
+  def scalaDriverInsert = Action.async {
+    scalaDriverPersonCreator.createPerson().map { _ => Ok }
+  }
+
 
 }

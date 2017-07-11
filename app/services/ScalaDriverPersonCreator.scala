@@ -2,6 +2,7 @@ package services
 
 import javax.inject.{Singleton, Inject}
 
+import org.mongodb.scala
 import org.mongodb.scala._
 import org.mongodb.scala.bson.collection.immutable.Document
 import controllers.Person
@@ -34,6 +35,8 @@ class ScalaDriverConnectionManager {
 
 }
 
+
+
 @Singleton
 class ScalaDriverPersonCollection extends ScalaDriverConnectionManager {
 
@@ -50,14 +53,18 @@ class ScalaDriverPersonCollection extends ScalaDriverConnectionManager {
 
       override def onComplete(): Unit = promise.complete(Try(()))
     }
-    collection.insertOne(write(person)).subscribe(observer)
+    collection.insertOne(person).subscribe(observer)
+    collection.find().subscribe(new Observer[Document] {override def onError(e: scala.Throwable): Unit = ???
+
+      override def onComplete(): Unit = ???
+
+      override def onNext(document: Document): Unit = document.getInteger("")
+    })
 
     promise.future
   }
 
-  private def write(person: Person): Document = {
-    Document("firstName" -> person.firstName, "lastName" -> person.lastName, "age" -> person.age)
-  }
+
 
 }
 

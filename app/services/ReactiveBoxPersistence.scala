@@ -32,7 +32,7 @@ class ReactiveBoxConnectionManager() {
 class ReactiveBoxPersistence extends ReactiveBoxConnectionManager{
 
 
-  def save(box: ReactiveBox): Future[WriteResult] = {
+  def save(box: CorrugatedReactiveBox): Future[WriteResult] = {
     boxCollection.flatMap { collection =>
       collection.insert(box)
     }
@@ -55,7 +55,7 @@ class ReactiveBoxPersistence extends ReactiveBoxConnectionManager{
 
   def findAllBoxesSortedByLength(): Future[List[ReactiveBox]] = {
     boxCollection.flatMap { collection =>
-      collection.find(BSONDocument()).sort(BSONDocument("length" -> 1)).cursor[ReactiveBox]().collect[List](25)
+      collection.find(BSONDocument()).sort(BSONDocument("length" -> 1)).cursor[CorrugatedReactiveBox]().collect[List](25)
     }
   }
 

@@ -39,11 +39,11 @@ class ScalaDriverBoxConnectionManager {
 @Singleton
 class ScalaDriverBoxPersistence extends ScalaDriverBoxConnectionManager {
 
-  val codecRegistry = fromRegistries( fromProviders(classOf[ScalaBox]), CodecRegistries.fromCodecs(new JodaCodec), DEFAULT_CODEC_REGISTRY )
+  val codecRegistry = fromRegistries( fromProviders(classOf[CorrugatedScalaBox]), CodecRegistries.fromCodecs(new JodaCodec), DEFAULT_CODEC_REGISTRY )
 
-  val collection: MongoCollection[ScalaBox] = database.getCollection[ScalaBox]("box").withCodecRegistry(codecRegistry)
+  val collection: MongoCollection[CorrugatedScalaBox] = database.getCollection[CorrugatedScalaBox]("box").withCodecRegistry(codecRegistry)
 
-  def save(box: ScalaBox): Future[Unit] = {
+  def save(box: CorrugatedScalaBox): Future[Unit] = {
 
     collection.insertOne(box).toFuture().map( _ => ())
   }
@@ -61,7 +61,7 @@ class ScalaDriverBoxPersistence extends ScalaDriverBoxConnectionManager {
 
     import org.mongodb.scala.model.Filters.{eq => eqTo}
 
-    val observable : SingleObservable[ScalaBox] = collection
+    val observable : SingleObservable[CorrugatedScalaBox] = collection
       .find(eqTo("_id", id)).first()
 
     observable.toFuture().map(box => {
@@ -73,7 +73,7 @@ class ScalaDriverBoxPersistence extends ScalaDriverBoxConnectionManager {
     collection.deleteMany(org.mongodb.scala.model.Filters.exists("length")).toFuture()
   }
 
-  def findAllBoxesSortedByLength(): Future[Seq[ScalaBox]] = {
+  def findAllBoxesSortedByLength(): Future[Seq[CorrugatedScalaBox]] = {
     collection
       .find().sort(ascending("length"))
       .toFuture()

@@ -65,11 +65,11 @@ object ReactiveBox {
     def write(jdtime: DateTime) = BSONDateTime(jdtime.getMillis)
   }
 
-  implicit val boxHandler = Macros.handlerOpts[ReactiveBox, AutomaticMaterialization]
+//  implicit val boxHandler = Macros.handlerOpts[ReactiveBox, AutomaticMaterialization]
   implicit val corrugatedBoxHandler = Macros.handler[CorrugatedReactiveBox]
-  implicit val rigidBoxHandler = Macros.handler[RigidReactiveBox]
-  implicit val foldingBoxHandler = Macros.handler[FoldingReactiveBox]
-  implicit val boxOfBoxes = Macros.handler[ReactiveBoxOfBoxes]
+//  implicit val rigidBoxHandler = Macros.handler[RigidReactiveBox]
+//  implicit val foldingBoxHandler = Macros.handler[FoldingReactiveBox]
+//  implicit val boxOfBoxes = Macros.handler[ReactiveBoxOfBoxes]
 
 }
 

@@ -40,10 +40,10 @@ class BoxCollectionSpec extends FunSuite {
   }
 
   test("Scala Driver Macros") {
-    val cBox = CorrugatedBox(BSONObjectID.generate().stringify, 1, 1, 1, DateTime.now(), 4)
-    val rBox = RigidBox(BSONObjectID.generate().stringify, 2, 1, 1, DateTime.now(), 5)
-    val fBox = FoldingBox(BSONObjectID.generate().stringify, 3, 1, 1, DateTime.now(), "b")
-    val boxOfBoxes = BoxOfBoxes(BSONObjectID.generate().stringify, 4, 1, 1, DateTime.now(), Set(cBox, rBox, fBox))
+    val cBox = CorrugatedReactiveBox(BSONObjectID.generate().stringify, 1, 1, 1, DateTime.now(), 4)
+    val rBox = RigidReactiveBox(BSONObjectID.generate().stringify, 2, 1, 1, DateTime.now(), 5)
+    val fBox = FoldingReactiveBox(BSONObjectID.generate().stringify, 3, 1, 1, DateTime.now(), "b")
+    val boxOfBoxes = ReactiveBoxOfBoxes(BSONObjectID.generate().stringify, 4, 1, 1, DateTime.now(), Set(cBox, rBox, fBox))
 
     val persister = new ScalaDriverBoxPersistence()
 //    Await.result(persister.saveBox(cBox), Duration(1000, "millis"))
@@ -54,7 +54,7 @@ class BoxCollectionSpec extends FunSuite {
             persister.save(boxOfBoxes))), Duration(1000, "millis"))
 
 
-    val box = Await.result[Option[CorrugatedBox]](persister.findOneCorrugatedBox(), Duration(1000, "millis"))
+    val box = Await.result[Option[CorrugatedReactiveBox]](persister.findOneCorrugatedBox(), Duration(1000, "millis"))
     println(box.get)
     //
     //      val boxes = Await.result[List[Box]](persister.findAllBoxes(), Duration(1000, "millis"))

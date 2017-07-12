@@ -1,7 +1,6 @@
 package services
 
-import com.rallyhealth.reactive.Box
-import com.rallyhealth.reactive.CorrugatedBox
+import com.google.inject.Singleton
 import controllers._
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.commands.WriteResult
@@ -12,7 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
-
+@Singleton
 class ReactiveBoxConnectionManager() {
 
   val mongoUri = "mongodb://localhost:27017/reactiveProto"
@@ -29,40 +28,41 @@ class ReactiveBoxConnectionManager() {
   def boxCollection = db1.map[BSONCollection](database => database.collection("box"))
 }
 
+@Singleton
 class ReactiveBoxPersistence extends ReactiveBoxConnectionManager{
 
 
-  def save(box: Box): Future[WriteResult] = {
+  def save(box: ReactiveBox): Future[WriteResult] = {
     boxCollection.flatMap { collection =>
       collection.insert(box)
     }
   }
 
-  def findOneCorrugatedBox(): Future[Option[CorrugatedBox]] = {
+  def findOneCorrugatedBox(): Future[Option[CorrugatedReactiveBox]] = {
     boxCollection.flatMap { collection =>
       val query = BSONDocument("length" -> 1)
-      collection.find(query).one[CorrugatedBox]
+      collection.find(query).one[CorrugatedReactiveBox]
     }
 
   }
 
-  def findCorrugatedBoxById(id: String): Future[Option[CorrugatedBox]] = {
+  def findCorrugatedBoxById(id: String): Future[Option[CorrugatedReactiveBox]] = {
     boxCollection.flatMap { collection =>
       val query = BSONDocument("_id" -> id)
-      collection.find(query).one[CorrugatedBox]
+      collection.find(query).one[CorrugatedReactiveBox]
     }
   }
 
-  def findAllBoxesSortedByLength(): Future[List[Box]] = {
+  def findAllBoxesSortedByLength(): Future[List[ReactiveBox]] = {
     boxCollection.flatMap { collection =>
-      collection.find(BSONDocument()).sort(BSONDocument("length" -> 1)).cursor[Box]().collect[List](25)
+      collection.find(BSONDocument()).sort(BSONDocument("length" -> 1)).cursor[ReactiveBox]().collect[List](25)
     }
   }
 
   def findAggregateLength(): Future[Int] = {
 
     boxCollection.flatMap { collection =>
-      import collection.BatchCommands.AggregationFramework.{Group, SumField, Project}
+      import collection.BatchCommands.AggregationFramework.{Group, Project, SumField}
 
       val res = collection.aggregate(
         Project(BSONDocument("_id" -> 0, "length" -> 1)),
